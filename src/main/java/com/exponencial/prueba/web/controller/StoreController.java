@@ -1,12 +1,12 @@
 package com.exponencial.prueba.web.controller;
 
-import com.exponencial.prueba.domain.Product;
+
 import com.exponencial.prueba.domain.Store;
 import com.exponencial.prueba.domain.service.StoreService;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,10 +14,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/stores")
+@CrossOrigin(origins = "http://localhost:3000")
 public class StoreController {
     @Autowired
     private StoreService storeService;
 
+    //@CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/all")
     public ResponseEntity<List<Store>> getAll() {
         return new ResponseEntity<>(storeService.getAll(), HttpStatus.OK);
@@ -33,16 +35,19 @@ public class StoreController {
     public ResponseEntity<Store> save(@RequestBody Store store) {
         return new ResponseEntity<>(storeService.save(store), HttpStatus.CREATED);
     }
-   /** @PutMapping("/update/{id}")
-    public ResponseEntity<Store> edit(@PathVariable("id") int storeId, @RequestBody Store store) {
-        Optional<Store> storeEdit = storeService.getStore(storeId);
-        if(storeEdit.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+       @PutMapping("/update/{id}")
+    public ResponseEntity<Store> edit(@PathVariable("id") Integer storeId, @RequestBody Store store) {
+
+        Optional<Store> storeEdit = storeService.edit(storeId, store);
+        if(storeEdit.isPresent()){
+            return new ResponseEntity(storeEdit, HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity(storeEdit, HttpStatus.BAD_REQUEST);
         }
-        Store storeDB = storeEdit.get();
-        storeDB.setName(store.getName());
-        return new ResponseEntity<>(storeService.save(storeDB), HttpStatus.CREATED);
-    }*/
+
+
+    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable("id") int storeId){

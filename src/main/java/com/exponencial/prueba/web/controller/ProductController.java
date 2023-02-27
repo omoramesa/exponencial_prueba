@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -46,17 +48,16 @@ public class ProductController {
         }
 
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Product> edit(@PathVariable("id") Integer productId, @RequestBody Product product) {
 
-     @PutMapping("/update/{id}")
-     public Product update(@RequestBody Product product, @PathVariable("id") int productId) {
-        return productService.getProduct(productId)
-                .map(productUpdate ->{
-                    productUpdate.setName(product.getName());
-                    return productService.save(productUpdate);
-                })
-                .orElseGet(()->{
-                   product.setProductId(productId);
-                   return productService.save(product);
-                });
+        Optional<Product> productEdit = productService.edit(productId, product);
+        if(productEdit.isPresent()){
+            return new ResponseEntity(productEdit, HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity(productEdit, HttpStatus.BAD_REQUEST);
+        }
+
+
     }
 }
